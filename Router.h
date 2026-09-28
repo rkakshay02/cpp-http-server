@@ -1,5 +1,9 @@
 #pragma once
 
+#include <fstream>
+#include <string>
+#include <sstream>
+
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 
@@ -22,10 +26,26 @@ public:
         // Home page
         if (request.getPath() == "/")
         {
+            std::ifstream file("index.html");
+
+            if (!file.is_open())
+            {
+                return HttpResponse(
+                    "HTTP/1.1 404 Not Found\r\n",
+                    "text/html",
+                    "File Not Found"
+                );
+            }
+
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+
+            std::string body = buffer.str();
+
             return HttpResponse(
                 "HTTP/1.1 200 OK\r\n",
                 "text/html",
-                "Hello from Router"
+                body
             );
         }
 
